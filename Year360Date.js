@@ -9,21 +9,21 @@ class Year360Date {
     #year;
     #dayOfYear;
 
-    constructor(gregorianDate) {
-        const unixDays = Math.floor(gregorianDate.getTime() / 86_400_000);
-        this.#year = 11970;
-        this.setDayOfYear(unixDays + 10);
-    }
-
     #normalize() {
-        while (this.#dayOfYear >= this.numDaysInYear) {
-            this.#dayOfYear -= this.numDaysInYear;
+        while (this.#dayOfYear >= this.getNumDaysInYear()) {
+            this.#dayOfYear -= this.getNumDaysInYear();
             this.#year++;
         }
         while (this.#dayOfYear < 0) {
             this.#year--;
-            this.#dayOfYear += this.numDaysInYear;
+            this.#dayOfYear += this.getNumDaysInYear();
         }
+    }
+
+    constructor(gregorianDate) {
+        const unixDays = Math.floor(gregorianDate.getTime() / 86_400_000);
+        this.#year = 11970;
+        this.setDayOfYear(unixDays + 10);
     }
 
     get year() {
@@ -35,18 +35,6 @@ class Year360Date {
         this.#year = newYear;
     }
 
-    get month() {
-        return Math.floor(this.#dayOfYear / 30);
-    }
-
-    get day() {
-        return this.#dayOfYear % 30;
-    }
-
-    get weekday() {
-        return Year360Date.weekdays[this.#dayOfYear % 6];
-    }
-
     get dayOfYear() {
         return this.#dayOfYear;
     }
@@ -56,10 +44,22 @@ class Year360Date {
             `Expected integer, got ${newDayOfYear}`);
         assert(newDayOfYear >= 0,
             `Expected positive number, got ${newDayOfYear}`);
-        assert(newDayOfYear < this.numDaysInYear,
-            `${newDayOfYear} invalid (must be less than ${this.numDaysInYear})`);
+        assert(newDayOfYear < this.getNumDaysInYear(),
+            `${newDayOfYear} invalid (must be less than ${this.getNumDaysInYear()})`);
 
         this.#dayOfYear = newDayOfYear;
+    }
+
+    getMonth() {
+        return Math.floor(this.#dayOfYear / 30);
+    }
+
+    getDay() {
+        return this.#dayOfYear % 30;
+    }
+
+    getWeekday() {
+        return Year360Date.weekdays[this.#dayOfYear % 6];
     }
 
     setDayOfYear(newDayOfYear) {
@@ -69,7 +69,7 @@ class Year360Date {
         this.#normalize();
     }
 
-    get isLeapYear() {
+    isLeapYear() {
         if (this.#year % 3200 === 0) {
             return false;
         }
@@ -85,16 +85,25 @@ class Year360Date {
         return false;
     }
 
-    get numDaysInYear() {
-        return this.isLeapYear ? 366 : 365;
+    getNumDaysInYear() {
+        return this.isLeapYear() ? 366 : 365;
+    }
+
+    getUnixTimestamp() {
+        let dayCount = 0;
+        for(let currentYear = 11970; currentYear < this.#year; currentYear++) {
+            dayCount += this.getNumDaysInYear();
+        }
+        dayCount += this.#dayOfYear;
+        return dayCount * 86_400;
     }
 
     toDateString() {
-        return `${zeroPad(this.year, 5)}-${zeroPad(this.month, 2)}-${zeroPad(this.day, 2)}`;
+        return `${zeroPad(this.year, 5)}-${zeroPad(this.getMonth(), 2)}-${zeroPad(this.getDay(), 2)}`;
     }
 
     toString() {
-        return `${this.toDateString()} ${this.weekday}`;
+        return `${this.toDateString()} ${this.getWeekday()}`;
     }
 }
 
