@@ -1,4 +1,7 @@
 const assert = require("assert");
+const zeroPad = (num, numZeros) => {
+    return String(num).padStart(numZeros, "0");
+};
 
 class Year360Date {
     static weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -84,6 +87,10 @@ class Year360Date {
 
     get numDaysInYear() {
         return this.isLeapYear ? 366 : 365;
+    }
+
+    toString() {
+        return `${zeroPad(this.year, 5)}-${zeroPad(this.month, 2)}-${zeroPad(this.day, 2)} ${this.weekday}`;
     }
 }
 
