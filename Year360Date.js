@@ -40,12 +40,10 @@ class Year360Date {
     }
 
     set dayOfYear(newDayOfYear) {
-        assert(Number.isInteger(newDayOfYear),
-            `Expected integer, got ${newDayOfYear}`);
-        assert(newDayOfYear >= 0,
-            `Expected positive number, got ${newDayOfYear}`);
+        assert(Number.isInteger(newDayOfYear) && newDayOfYear >= 0,
+            `Expected non-negative integer, got ${newDayOfYear}`);
         assert(newDayOfYear < this.getNumDaysInYear(),
-            `${newDayOfYear} invalid (must be less than ${this.getNumDaysInYear()})`);
+            `Invalid day of year: ${newDayOfYear} (must be less than ${this.getNumDaysInYear()})`);
 
         this.#dayOfYear = newDayOfYear;
     }
@@ -85,14 +83,41 @@ class Year360Date {
         return false;
     }
 
+    static isLeapYear(year) {
+        assert(Number.isInteger(year),
+            `Expected integer, got ${year}`);
+        if (year % 3200 === 0) {
+            return false;
+        }
+        if (year % 400 === 0) {
+            return true;
+        }
+        if (year % 100 === 0) {
+            return false;
+        }
+        if (year % 4 === 0) {
+            return true;
+        }
+        return false;
+    }
+
     getNumDaysInYear() {
         return this.isLeapYear() ? 366 : 365;
     }
 
+    static getNumDaysInYear(year) {
+        assert(Number.isInteger(year),
+            `Expected integer, got ${year}`);
+        return Year360Date.isLeapYear(year);
+    }
+
     getUnixTimestamp() {
         let dayCount = 0;
-        for(let currentYear = 11970; currentYear < this.#year; currentYear++) {
-            dayCount += this.getNumDaysInYear();
+        for (let currentYear = 11970; currentYear < this.#year; currentYear++) {
+            dayCount += Year360Date.getNumDaysInYear(currentYear);
+        }
+        for (let currentYear = this.#year; currentYear < 11970; currentYear++) {
+            dayCount -= Year360Date.getNumDaysInYear(currentYear);
         }
         dayCount += this.#dayOfYear;
         return dayCount * 86_400;
