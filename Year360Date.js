@@ -1,3 +1,5 @@
+const assert = require("assert");
+
 class Year360Date {
     static weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -5,14 +7,16 @@ class Year360Date {
     #dayOfYear;
 
     constructor(gregorianDate) {
-        const gregorianYear = gregorianDate.getFullYear();
-        const gregorianMonthIndex = gregorianDate.getMonth();
-        const gregorianDay = gregorianDate.getDate();
+        const unixDays = Math.floor(gregorianDate.getTime() / 86_400_000);
+        this.#year = 11970;
+        this.setDayOfYear(unixDays + 10);
+    }
 
-        this.#year = gregorianYear + 10000;
-        this.#dayOfYear = (Date.UTC(gregorianYear, gregorianMonthIndex, gregorianDay)
-                         - Date.UTC(gregorianYear, 0, 1))
-                         / 86_400_000;
+    #normalize() {
+        while (this.#dayOfYear >= this.numDaysInYear) {
+            this.#dayOfYear -= this.numDaysInYear;
+            this.#year++;
+        }
     }
 
     get year() {
@@ -20,6 +24,7 @@ class Year360Date {
     }
 
     set year(newYear) {
+        assert(Number.isInteger(newYear), `Expected integer, got ${newYear}`);
         this.#year = newYear;
     }
 
@@ -30,7 +35,7 @@ class Year360Date {
     get day() {
         return this.#dayOfYear % 30;
     }
-    
+
     get weekday() {
         return Year360Date.weekdays[this.#dayOfYear % 6];
     }
@@ -40,12 +45,19 @@ class Year360Date {
     }
 
     set dayOfYear(newDayOfYear) {
-        if (newDayOfYear >= this.numDaysInYear) {
-            this.#year++;
-            this.#dayOfYear = newDayOfYear - this.numDaysInYear;
-        } else {
-            this.#dayOfYear = newDayOfYear;
-        }
+        assert(isInteger(newDayOfYear),
+            `Expected integer, got ${newDayOfYear}`);
+        assert(newDayOfYear >= 0,
+            `Expected positive number, got ${newDayOfYear}`);
+        assert(newDayOfYear < this.numDaysInYear,
+            `${newDayOfYear} invalid (must be less than ${this.numDaysInYear})`);
+
+        this.#dayOfYear = newDayOfYear;
+    }
+
+    setDayOfYear(newDayOfYear) {
+        this.#dayOfYear = newDayOfYear;
+        this.#normalize();
     }
 
     get isLeapYear() {
