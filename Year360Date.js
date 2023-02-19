@@ -17,6 +17,10 @@ class Year360Date {
             this.#dayOfYear -= this.numDaysInYear;
             this.#year++;
         }
+        while (this.#dayOfYear < 0) {
+            this.#year--;
+            this.#dayOfYear += this.numDaysInYear;
+        }
     }
 
     get year() {
@@ -45,7 +49,7 @@ class Year360Date {
     }
 
     set dayOfYear(newDayOfYear) {
-        assert(isInteger(newDayOfYear),
+        assert(Number.isInteger(newDayOfYear),
             `Expected integer, got ${newDayOfYear}`);
         assert(newDayOfYear >= 0,
             `Expected positive number, got ${newDayOfYear}`);
@@ -56,6 +60,8 @@ class Year360Date {
     }
 
     setDayOfYear(newDayOfYear) {
+        assert(Number.isInteger(newDayOfYear),
+            `Expected integer, got ${newDayOfYear}`);
         this.#dayOfYear = newDayOfYear;
         this.#normalize();
     }
