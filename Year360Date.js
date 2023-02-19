@@ -89,8 +89,12 @@ class Year360Date {
         return this.isLeapYear ? 366 : 365;
     }
 
+    toDateString() {
+        return `${zeroPad(this.year, 5)}-${zeroPad(this.month, 2)}-${zeroPad(this.day, 2)}`;
+    }
+
     toString() {
-        return `${zeroPad(this.year, 5)}-${zeroPad(this.month, 2)}-${zeroPad(this.day, 2)} ${this.weekday}`;
+        return `${this.toDateString()} ${this.weekday}`;
     }
 }
 
