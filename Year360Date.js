@@ -84,8 +84,20 @@ class Year360Date {
         return this.#year;
     }
 
+    /**
+     * Get the year as a string in the format YYYYY
+     * @returns {string} The year in the format YYYYY
+     */
+    getYearString() {
+        return zeroPad(this.year, 5);
+    }
+
     set year(year) {
         assert(Number.isInteger(year), `Expected integer, got ${year}`);
+        assert(this.#dayOfYear < Year360Date.getNumDaysInYear(year),
+            `Cannot set year to ${this.getYearString()}: `
+            + `dayOfYear=${this.#dayOfYear}, which does not exist in the year `
+            + this.getYearString());
         this.#year = year;
     }
 
@@ -166,7 +178,7 @@ class Year360Date {
     /**
      * Set the day of the year. A day outside the range of days in the year are
      * wrapped around appropriately. For example, using setDayOfYear(365) in a
-     * non-leap-year or using setDayOfYear(366) in a leap year sets the date to
+     * common year or using setDayOfYear(366) in a leap year sets the date to
      * the first day of the next year; using setDayOfYear(-1) sets the date to
      * the last day of the previous year.
      * @param {number} dayOfYear The day of the year
