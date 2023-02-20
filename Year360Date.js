@@ -1,5 +1,8 @@
 const assert = require("assert");
 const zeroPad = (num, numZeros) => {
+    if (num < 0) {
+        return "\u2212" + String(num).substring(1).padStart(numZeros, "0");
+    }
     return String(num).padStart(numZeros, "0");
 };
 
