@@ -176,6 +176,14 @@ class Year360Date {
     }
 
     /**
+     * Get the week of the year
+     * @returns The week of the year, an integer in the range [0, 60]
+     */
+    getWeek() {
+        return Math.floor(this.#dayOfYear / 6);
+    }
+
+    /**
      * Set the day of the year. A day outside the range of days in the year are
      * wrapped around appropriately. For example, using setDayOfYear(365) in a
      * common year or using setDayOfYear(366) in a leap year sets the date to
