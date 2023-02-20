@@ -46,16 +46,35 @@ class Year360Date {
     }
 
     /**
-     * Construct a Year360 object from a JavaScript Date object.
+     * Construct a Year360Date object from a JavaScript Date object.
      * Note: uses the date in UTC; be careful if converting from local time. For
      * example, if the time is set to 22:00 in UTC-5, the next day will be used.
+     *
+     * @constructor
      * @param {date} [gregorianDate=new Date()] JavaScript Date object to
      *     convert to a Year360 date object
+     *//**
+     * Construct a Year360Date object from a Year360 year, month, day
+     *
+     * @constructor
+     * @param {number} year The year
+     * @param {number} month The month, an integer in the range [0, 12]
+     * @param {number} day The day, an integer representing the day in the month
      */
-    constructor(gregorianDate = new Date()) {
-        const unixDays = Math.floor(gregorianDate.getTime() / 86_400_000);
-        this.#year = 11970;
-        this.setDayOfYear(unixDays + 10);
+    constructor(year = new Date(), month, day) {
+        if(Number.isInteger(year) && Number.isInteger(month)
+            && Number.isInteger(day)) {
+                this.#year = year;
+                if(month === 12) {
+                    this.setToIntercalaris(day);
+                } else {
+                    this.setMonthDay(month, day);
+                }
+        } else {
+            const unixDays = Math.floor(year.getTime() / 86_400_000);
+            this.#year = 11970;
+            this.setDayOfYear(unixDays + 10);
+        }
     }
 
     get year() {
@@ -219,19 +238,29 @@ class Year360Date {
     }
 
     /**
-     * Get the Unix timestamp of the current date
+     * Get the Unix timestamp of the current date in UTC
      * @returns {number} The Unix timestamp of the current date
      */
     getUnixTimestamp() {
-        let dayCount = -10;
-        for (let currentYear = 11970; currentYear < this.#year; currentYear++) {
-            dayCount += Year360Date.getNumDaysInYear(currentYear);
+        let dayCount = -10;     // Unix epoch is on 11970-00-10
+        for (let i = 11970; i < this.#year; i++) {
+            dayCount += Year360Date.getNumDaysInYear(i);
         }
-        for (let currentYear = this.#year; currentYear < 11970; currentYear++) {
-            dayCount -= Year360Date.getNumDaysInYear(currentYear);
+        for (let i = this.#year; i < 11970; i++) {
+            dayCount -= Year360Date.getNumDaysInYear(i);
         }
         dayCount += this.#dayOfYear;
         return dayCount * 86_400;
+    }
+
+    /**
+     * Get the current date as a JavaScript Date object in UTC. You can then
+     * use the getUTC* methods to get the year, month, and day in the Gregorian
+     * calendar.
+     * @returns {date} The current date, in UTC
+     */
+    toGregorianDate() {
+        return new Date(this.getUnixTimestamp() * 1000);
     }
 
     /**

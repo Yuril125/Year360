@@ -12,4 +12,3 @@ gregorianDate.setFullYear(gregorianYear);   // In case 0 <= gregorianYear <= 99
 
 y360Date = new Year360Date(gregorianDate);
 console.log("\n" + y360Date);
-console.log(y360Date.getUnixTimestamp());
