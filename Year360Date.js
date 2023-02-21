@@ -151,9 +151,9 @@ class Year360Date {
      *     the last day in Intercalaris.
      */
     setToIntercalaris(day = 0) {
-        const lastDayIntercalaris = this.getNumDaysInYear() - 361;
-        assert(Number.isInteger(day) && day >= 0 && day <= lastDayIntercalaris,
-            `Expected day to be integer in range [0, ${lastDayIntercalaris}], got ${day}`);
+        const lastDay = this.getNumDaysInYear() - 361;
+        assert(Number.isInteger(day) && day >= 0 && day <= lastDay,
+            `Expected day to be integer in range [0, ${lastDay}], got ${day}`);
         this.#dayOfYear = 360 + day;
     }
 
