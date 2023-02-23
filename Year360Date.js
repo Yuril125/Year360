@@ -1,16 +1,17 @@
 const assert = require("assert");
-const zeroPad = (num, numZeros) => {
-    if (num < 0) {
-        return "\u2212" + String(num).substring(1).padStart(numZeros, "0");
-    }
-    return String(num).padStart(numZeros, "0");
-};
 
 class Year360Date {
     static weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     #year;
     #dayOfYear;
+
+    static #zeroPad(num, numZeros) {
+        if (num < 0) {
+            return "\u2212" + String(num).substring(1).padStart(numZeros, "0");
+        }
+        return String(num).padStart(numZeros, "0");
+    }
 
     static #numLeapYearsBefore(year) {
         assert(Number.isInteger(year), `Expected integer, got ${year}`);
@@ -89,7 +90,7 @@ class Year360Date {
      * @returns {string} The year in the format YYYYY
      */
     getYearString() {
-        return zeroPad(this.year, 5);
+        return Year360Date.#zeroPad(this.year, 5);
     }
 
     set year(year) {
@@ -291,7 +292,7 @@ class Year360Date {
      * @returns {string} The date in the format YYYYY-MM-DD
      */
     toDateString() {
-        return `${zeroPad(this.year, 5)}-${zeroPad(this.getMonth(), 2)}-${zeroPad(this.getDay(), 2)}`;
+        return `${Year360Date.#zeroPad(this.year, 5)}-${Year360Date.#zeroPad(this.getMonth(), 2)}-${Year360Date.#zeroPad(this.getDay(), 2)}`;
     }
 
     /**
