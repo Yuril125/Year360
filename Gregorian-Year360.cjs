@@ -1,4 +1,4 @@
-const Year360Date = require("./Year360Date");
+const Year360Date = require("./Year360Date.cjs");
 const prompt = require("prompt-sync")();
 
 console.log("Today is " + new Year360Date() + ".\n");
